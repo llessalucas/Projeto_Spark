@@ -44,5 +44,5 @@ from pyspark.sql.functions import regexp_replace
 df3= df2.withColumn("Tipo_Pagamento",regexp_replace("Tipo_Pagamento","Cash","Dinheiro")).withColumn("Tipo_Pagamento",regexp_replace("Tipo_Pagamento","Ewallet","Carteira Digital")).withColumn("Tipo_Pagamento",regexp_replace("Tipo_Pagamento","Credit card","Cartao de Credito"))
 display (df3)
 
-Exportando Tabela
+# Exportando Tabela
 df3.write.saveAsTable("BD_VENDAS")
