@@ -1,0 +1,49 @@
+# Caminho do Arquivo 
+caminho_arquivo = "/FileStore/tables/Carga/Crime_Data_from_2020_to_Present.csv"
+df = spark.read.csv(caminho_arquivo, header=True, inferSchema=True)
+
+# Conte a quantidade de linhas da tabela
+quantidade_linhas = df.count()
+
+# Exiba a contagem
+print("Esse dataset possui", quantidade_linhas, "linhas.")
+
+
+# Calculando quantidade de partições ideal
+
+def obter_numero_particoes(df):
+    # Obter o número total de linhas no DataFrame
+    numero_linhas = df.count()
+
+    # Calcular o número ideal de partições
+    numero_particoes = max(1, numero_linhas // 10000)
+
+    return numero_particoes
+
+# Obter o número ideal de partições
+numero_particoes = obter_numero_particoes(df)
+
+# Paralelizar o DataFrame com o número ideal de partições
+df = df.repartition(numero_particoes)
+
+# Verificando quantas paralelizações foram feitas
+print("Quantidade de partições utilizadas:", df.rdd.getNumPartitions())
+
+# Verificar o conteúdo de algumas linhas do RDD para garantir que ele esteja correto
+print(df.take(5))
+
+# Exibindo o dataframe
+df.show()
+
+from pyspark.sql.functions import col
+# Filtre as linhas que contêm a palavra 'ASSAULT' em qualquer coluna do DataFrame
+filtro_palavra = df.filter(col("Crm Cd Desc").contains('ASSAULT'))
+
+# Coleta os resultados
+resultados = filtro_palavra.collect()
+
+# Conte a quantidade de vezes que a palavra 'ASSAULT' aparece na coluna 'Crm Cd Desc'
+quantidade_assault = filtro_palavra.count()
+
+# Exiba a contagem
+print("A palavra 'ASSAULT' aparece", quantidade_assault, "vezes na tabela.")
